@@ -1,0 +1,28 @@
+{
+  "attacker": {
+    "name": "mistral-7b-instruct-v0.1",
+    "url": "http://127.0.0.1:1234/v1/chat/completions",
+    "port": 1234,
+    "temperature": 0.9,
+    "max_tokens": 500
+  },
+  "defender": {
+    "name": "mistral-7b-instruct-v0.1",
+    "url": "http://127.0.0.1:1234/v1/chat/completions",
+    "port": 1234,
+    "temperature": 0.3,
+    "max_tokens": 300
+  },
+  "security": {
+    "max_strikes_cae": 1,
+    "max_strikes_fsa": 3,
+    "max_strikes_mme": 4,
+    "use_fast_filter": true,
+    "use_llm_judge": true
+  },
+  "logging": {
+    "enabled": true,
+    "level": "INFO",
+    "save_conversations": true
+  }
+}
