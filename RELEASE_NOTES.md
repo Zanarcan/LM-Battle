@@ -1,8 +1,42 @@
-# 🎉 Release Notes - ART Project Enhanced v2.0
+# 🎉 Release Notes - ART Project v2.5
 
 **Fecha**: 28 Diciembre 2024
-**Versión**: 2.0 - Enhanced System
+**Versión**: 2.5 - Enhanced System + Battle Arena UI
 **Estado**: ✅ COMPLETADO Y PROBADO
+
+---
+
+## 🎮 NUEVO EN v2.5 - Battle Arena UI
+
+**Interfaz Visual Interactiva para Batallas LLM vs LLM**
+
+### Streamlit Dashboard Completo
+
+✨ **Características Principales**:
+- ⚔️ Batallas en tiempo real con visualización
+- 📊 Analytics con gráficos Plotly interactivos
+- 🏆 Hall of Fame de mejores/peores ataques
+- ⚡ Quick Battle para pruebas individuales
+- 🎨 Diseño cyberpunk con fuentes Orbitron/Rajdhani
+- 💾 Export JSON/CSV de resultados
+
+### Archivos Nuevos
+- **streamlit_app.py** (900+ líneas): Dashboard completo
+- **run_streamlit.py**: Launcher automático con verificaciones
+- **STREAMLIT_GUIDE.md**: Guía completa del UI
+- **UI_PREVIEW.md**: Preview visual del diseño
+- **QUICK_START.md**: Referencia rápida
+
+### Uso
+```bash
+python run_streamlit.py
+# O manualmente:
+streamlit run streamlit_app.py
+```
+
+---
+
+## 📊 Resultados de Pruebas (v2.0)
 
 ---
 
