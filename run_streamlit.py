@@ -85,16 +85,16 @@ def check_config():
     print(f"{Fore.YELLOW}[3/4] Verificando configuración...{Style.RESET_ALL}")
 
     try:
-        with open('config.json', 'r', encoding='utf-8') as f:
+        with open('config/config.json', 'r', encoding='utf-8') as f:
             import json
             config = json.load(f)
-            print(f"{Fore.GREEN}  ✅ config.json encontrado{Style.RESET_ALL}")
-            print(f"  📝 Defender: {config.get('defender', {}).get('model', 'Unknown')}")
-            print(f"  📝 Attacker: {config.get('attacker', {}).get('model', 'Unknown')}")
+            print(f"{Fore.GREEN}  ✅ config/config.json encontrado{Style.RESET_ALL}")
+            print(f"  📝 Defender: {config.get('defender', {}).get('name', 'Unknown')}")
+            print(f"  📝 Attacker: {config.get('attacker', {}).get('name', 'Unknown')}")
             print()
             return True
     except FileNotFoundError:
-        print(f"{Fore.RED}  ❌ config.json NO encontrado{Style.RESET_ALL}")
+        print(f"{Fore.RED}  ❌ config/config.json NO encontrado{Style.RESET_ALL}")
         print(f"{Fore.YELLOW}  💡 Asegúrate de estar en la carpeta art-project{Style.RESET_ALL}\n")
         return False
     except Exception as e:

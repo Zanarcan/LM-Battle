@@ -600,25 +600,26 @@ with tab1:
                     # Elegir estrategia aleatoria
                     import random
                     if attacker_type == "Enhanced (Dynamic)" or attacker_type == "God Mode (Semantic)":
+                        # Estos atacantes usan sus propios nombres de técnica internamente o estrategias de AttackStrategy
+                        # Para compatibilidad con el UI, mapeamos a AttackStrategy si es posible
                         techniques = [
-                            "dynamic_template",
-                            "homoglyph",
-                            "unicode_smuggling",
-                            "encoding",
-                            "context_pollution"
+                            AttackStrategy.PARAPHRASE,
+                            AttackStrategy.OBFUSCATION,
+                            AttackStrategy.CONTEXT_BUILDING,
+                            AttackStrategy.GRADUAL
                         ]
                         technique = random.choice(techniques)
                         attack = attacker.generate_attack(technique)
                     else:
-                        strategies = [AttackStrategy.INDIRECT, AttackStrategy.FRAGMENTED,
-                                     AttackStrategy.ENCODING, AttackStrategy.OBFUSCATED]
+                        strategies = [AttackStrategy.DIRECT, AttackStrategy.PARAPHRASE,
+                                     AttackStrategy.GRADUAL, AttackStrategy.ROLE_PLAY]
                         attack = attacker.generate_attack(random.choice(strategies))
 
                     # Mostrar ataque
                     attack_placeholder.markdown(f"""
                     <div class="attack-display">
                         <strong>🔴 ATTACK GENERATED</strong><br>
-                        <strong>Technique:</strong> {attack.technique}<br>
+                        <strong>Technique:</strong> {attack.technique.value if hasattr(attack.technique, 'value') else attack.technique}<br>
                         <strong>Subtlety:</strong> {attack.subtlety}/10<br>
                         {'<strong>Message:</strong> ' + attack.message[:100] + '...' if show_details else ''}
                     </div>
@@ -663,7 +664,7 @@ with tab1:
                     battle_record = {
                         'round': round_num,
                         'timestamp': datetime.now().isoformat(),
-                        'attack_technique': attack.technique,
+                        'attack_technique': attack.technique.value if hasattr(attack.technique, 'value') else attack.technique,
                         'attack_subtlety': attack.subtlety,
                         'attack_message': attack.message,
                         'defense_action': decision.action,
@@ -674,21 +675,22 @@ with tab1:
                     st.session_state.battle_history.append(battle_record)
 
                     # Actualizar stats por técnica
-                    if attack.technique not in st.session_state.technique_stats:
-                        st.session_state.technique_stats[attack.technique] = {
+                    tech_key = attack.technique.value if hasattr(attack.technique, 'value') else attack.technique
+                    if tech_key not in st.session_state.technique_stats:
+                        st.session_state.technique_stats[tech_key] = {
                             'total': 0,
                             'blocked': 0,
                             'allowed': 0,
                             'watched': 0
                         }
 
-                    st.session_state.technique_stats[attack.technique]['total'] += 1
+                    st.session_state.technique_stats[tech_key]['total'] += 1
                     if decision.action == "BLOQUEAR":
-                        st.session_state.technique_stats[attack.technique]['blocked'] += 1
+                        st.session_state.technique_stats[tech_key]['blocked'] += 1
                     elif decision.action == "VIGILAR":
-                        st.session_state.technique_stats[attack.technique]['watched'] += 1
+                        st.session_state.technique_stats[tech_key]['watched'] += 1
                     else:
-                        st.session_state.technique_stats[attack.technique]['allowed'] += 1
+                        st.session_state.technique_stats[tech_key]['allowed'] += 1
 
                     st.markdown("---")
 

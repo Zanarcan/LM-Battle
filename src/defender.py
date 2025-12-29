@@ -84,6 +84,9 @@ class AxioDefender:
         self.use_fast_filter = config.get("security", {}).get("use_fast_filter", True)
         self.use_llm_judge = config.get("security", {}).get("use_llm_judge", True)
 
+        # Verificar disponibilidad de LLM
+        self.llm_available = self.llm_client.is_available() if self.llm_client else False
+
         log_evento("✅ AXIO Defender inicializado", "INFO")
         log_evento(f"   Configuración: CAE={self.max_strikes_cae}, FSA={self.max_strikes_fsa}, MME={self.max_strikes_mme}", "INFO")
 

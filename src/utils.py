@@ -6,8 +6,22 @@ Utilidades compartidas para el proyecto ART
 
 import hashlib
 import json
+import sys
+import io
 from typing import Dict, List
 from datetime import datetime
+
+# Fix encoding para Windows (Comentado si da problemas en Streamlit)
+# if sys.platform == 'win32':
+#     try:
+#         import sys
+#         import io
+#         # Solo aplicar si no estamos en un entorno interactivo/Streamlit que ya gestiona esto
+#         if hasattr(sys.stdout, 'buffer'):
+#             sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+#             sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
+#     except Exception:
+#         pass
 
 
 def load_config(config_path: str = "config/config.json") -> Dict:

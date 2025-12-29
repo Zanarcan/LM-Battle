@@ -7,6 +7,7 @@ Enfoque correcto: detecta INTENCIÓN, no palabras exactas
 
 import numpy as np
 import requests
+import re
 from typing import List, Tuple, Optional, Dict
 from dataclasses import dataclass
 from src.utils import log_evento

@@ -5,6 +5,8 @@ Enhanced Defender - Defensor mejorado con Nivel 1 de mejoras
 Incluye: patrones expandidos, detección de n-gramas, normalización de ofuscación
 """
 
+import json
+import re
 from typing import Optional, Tuple
 from src.defender import AxioDefender, DefenseDecision
 from src.utils import log_evento, texto_a_hash

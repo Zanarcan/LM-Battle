@@ -24,12 +24,18 @@ class AttackStrategy(Enum):
     CONTEXT_BUILDING = "context"  # Construcción de contexto
     DATASET = "dataset"  # Ataques basados en dataset externo
 
+    # Nuevas estrategias para compatibilidad con UI
+    INDIRECT = "indirect"
+    FRAGMENTED = "fragmented"
+    ENCODING = "encoding"
+    OBFUSCATED = "obfuscated"
+
 
 @dataclass
 class AttackPrompt:
     """Representa un prompt de ataque"""
-    content: str
-    strategy: AttackStrategy
+    message: str
+    technique: AttackStrategy
     expected_threat: str  # CAE, FSA, MME
     subtlety: int  # 1-10, donde 10 es más sutil
     description: str
@@ -152,8 +158,8 @@ class AdvancedAttacker:
         content = random.choice(templates.get(threat_type, templates["CAE"]))
 
         return AttackPrompt(
-            content=content,
-            strategy=AttackStrategy.DIRECT,
+            message=content,
+            technique=AttackStrategy.DIRECT,
             expected_threat=threat_type,
             subtlety=2,
             description="Ataque directo con palabras clave"
@@ -185,8 +191,8 @@ class AdvancedAttacker:
         content = random.choice(templates.get(threat_type, templates["CAE"]))
 
         return AttackPrompt(
-            content=content,
-            strategy=AttackStrategy.PARAPHRASE,
+            message=content,
+            technique=AttackStrategy.PARAPHRASE,
             expected_threat=threat_type,
             subtlety=6,
             description="Parafraseo para evitar filtros de palabras clave"
@@ -215,8 +221,8 @@ class AdvancedAttacker:
         content = random.choice(templates.get(threat_type, templates["CAE"]))
 
         return AttackPrompt(
-            content=content,
-            strategy=AttackStrategy.GRADUAL,
+            message=content,
+            technique=AttackStrategy.GRADUAL,
             expected_threat=threat_type,
             subtlety=7,
             description="Escalación gradual construyendo confianza"
@@ -245,8 +251,8 @@ class AdvancedAttacker:
         content = random.choice(templates.get(threat_type, templates["CAE"]))
 
         return AttackPrompt(
-            content=content,
-            strategy=AttackStrategy.ROLE_PLAY,
+            message=content,
+            technique=AttackStrategy.ROLE_PLAY,
             expected_threat=threat_type,
             subtlety=8,
             description="Suplantación de identidad autorizada"
@@ -275,8 +281,8 @@ class AdvancedAttacker:
         content = random.choice(templates.get(threat_type, templates["CAE"]))
 
         return AttackPrompt(
-            content=content,
-            strategy=AttackStrategy.OBFUSCATION,
+            message=content,
+            technique=AttackStrategy.OBFUSCATION,
             expected_threat=threat_type,
             subtlety=5,
             description="Ofuscación con espacios y caracteres"
@@ -305,8 +311,8 @@ class AdvancedAttacker:
         content = random.choice(templates.get(threat_type, templates["CAE"]))
 
         return AttackPrompt(
-            content=content,
-            strategy=AttackStrategy.MULTILINGUAL,
+            message=content,
+            technique=AttackStrategy.MULTILINGUAL,
             expected_threat=threat_type,
             subtlety=6,
             description="Uso de múltiples idiomas"
@@ -335,8 +341,8 @@ class AdvancedAttacker:
         content = random.choice(templates.get(threat_type, templates["CAE"]))
 
         return AttackPrompt(
-            content=content,
-            strategy=AttackStrategy.CONTEXT_BUILDING,
+            message=content,
+            technique=AttackStrategy.CONTEXT_BUILDING,
             expected_threat=threat_type,
             subtlety=9,
             description="Construcción de contexto legítimo aparente"
@@ -367,8 +373,8 @@ class AdvancedAttacker:
                 detected_threat = threat_type  # Use requested type if unclear
 
             return AttackPrompt(
-                content=content,
-                strategy=AttackStrategy.DATASET,
+                message=content,
+                technique=AttackStrategy.DATASET,
                 expected_threat=detected_threat,
                 subtlety=subtlety,
                 description="Ataque basado en dataset Pliny_HackAPrompt_Dataset"
@@ -413,8 +419,8 @@ Responde SOLO con el mensaje, sin explicaciones."""
             content = self.llm_client.simple_prompt(prompt, temperature=0.9)
 
             return AttackPrompt(
-                content=content.strip(),
-                strategy=AttackStrategy.PARAPHRASE,
+                message=content.strip(),
+                technique=AttackStrategy.PARAPHRASE,
                 expected_threat=target_threat,
                 subtlety=9,
                 description="Ataque generado creativamente por LLM"

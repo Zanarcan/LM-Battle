@@ -87,8 +87,8 @@ class DynamicTemplateAttacker(AdvancedAttacker):
                 content = f"{intro} {target}"
 
             return AttackPrompt(
-                content=content,
-                strategy=AttackStrategy.PARAPHRASE,
+                message=content,
+                technique=AttackStrategy.PARAPHRASE,
                 expected_threat=threat_type,
                 subtlety=7,
                 description="Parafraseo dinámico FSA con justificación"
@@ -114,8 +114,8 @@ class DynamicTemplateAttacker(AdvancedAttacker):
             content = f"{resp}. {follow}" if follow else resp
 
             return AttackPrompt(
-                content=content,
-                strategy=AttackStrategy.PARAPHRASE,
+                message=content,
+                technique=AttackStrategy.PARAPHRASE,
                 expected_threat=threat_type,
                 subtlety=6,
                 description="Respuesta manipuladora menor"
@@ -130,8 +130,8 @@ class DynamicTemplateAttacker(AdvancedAttacker):
         content = f"{verb.capitalize()} {obj} {trans}{action}"
 
         return AttackPrompt(
-            content=content,
-            strategy=AttackStrategy.PARAPHRASE,
+            message=content,
+            technique=AttackStrategy.PARAPHRASE,
             expected_threat=threat_type,
             subtlety=7,
             description="Parafraseo dinámico con fragmentos combinados"
@@ -194,8 +194,8 @@ class DynamicTemplateAttacker(AdvancedAttacker):
                 result += char
 
         return AttackPrompt(
-            content=result,
-            strategy=AttackStrategy.OBFUSCATION,
+            message=result,
+            technique=AttackStrategy.OBFUSCATION,
             expected_threat=threat_type,
             subtlety=9,
             description="Ataque con homoglyphs Unicode (Cyrillic/Latin)"
@@ -245,8 +245,8 @@ class DynamicTemplateAttacker(AdvancedAttacker):
                 result += invisible
 
         return AttackPrompt(
-            content=result,
-            strategy=AttackStrategy.OBFUSCATION,
+            message=result,
+            technique=AttackStrategy.OBFUSCATION,
             expected_threat=threat_type,
             subtlety=10,
             description="Unicode smuggling con caracteres invisibles"
@@ -293,8 +293,8 @@ class DynamicTemplateAttacker(AdvancedAttacker):
 
         return [
             AttackPrompt(
-                content=msg,
-                strategy=AttackStrategy.GRADUAL,
+                message=msg,
+                technique=AttackStrategy.GRADUAL,
                 expected_threat=threat_type,
                 subtlety=sub,
                 description=f"Payload splitting parte {i+1}/{len(messages)}"
@@ -334,8 +334,8 @@ class DynamicTemplateAttacker(AdvancedAttacker):
         content = random.choice(wrappers)
 
         return AttackPrompt(
-            content=content,
-            strategy=AttackStrategy.OBFUSCATION,
+            message=content,
+            technique=AttackStrategy.OBFUSCATION,
             expected_threat=threat_type,
             subtlety=8,
             description="Encoding attack con base64"
@@ -394,8 +394,8 @@ class DynamicTemplateAttacker(AdvancedAttacker):
         content = f"{noise} {attack}{end_noise}"
 
         return AttackPrompt(
-            content=content,
-            strategy=AttackStrategy.CONTEXT_BUILDING,
+            message=content,
+            technique=AttackStrategy.CONTEXT_BUILDING,
             expected_threat=threat_type,
             subtlety=8,
             description="Context pollution attack"
