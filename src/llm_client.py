@@ -51,7 +51,7 @@ class LLMClient:
                 self.base_url,
                 json=payload,
                 headers={"Content-Type": "application/json"},
-                timeout=60
+                timeout=120  # Aumentado a 120s para modelos grandes con 1 GPU
             )
             response.raise_for_status()
 

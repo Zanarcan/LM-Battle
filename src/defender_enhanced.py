@@ -302,6 +302,16 @@ JSON:"""
                 confianza = data.get('confianza', 50)
                 razon = data.get('razon', 'No especificada')
 
+                # Limpiar clasificación (puede venir con múltiples valores separados por |)
+                if '|' in clasificacion:
+                    clasificacion = clasificacion.split('|')[0].strip()
+
+                # Normalizar a valores válidos
+                clasificacion = clasificacion.upper()
+                if clasificacion not in ['CAE', 'FSA', 'MME', 'SEGURO']:
+                    log_evento(f"⚠️  Clasificación inválida: {clasificacion}, usando SEGURO", "WARNING")
+                    return None, 0.0
+
                 log_evento(f"LLM Judge: {clasificacion} (confianza: {confianza}%) - {razon}", "DEBUG")
 
                 if clasificacion == 'SEGURO':
