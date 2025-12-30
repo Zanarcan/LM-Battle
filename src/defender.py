@@ -20,8 +20,10 @@ class DefenseDecision:
     action: str  # "PERMITIR", "VIGILAR", "BLOQUEAR"
     risk_score: float  # 0.0 a 1.0
     threat_type: Optional[str]  # "CAE", "FSA", "MME", None
-    reasoning: str  # Explicación de la decisión
+    reasoning: str  # Explicación de la decisión (CoT interno)
     vector_state: Dict[str, int]  # Estado actual del vector
+    user_response: str = ""  # Respuesta que daría al atacante
+    llm_metadata: Optional[Dict] = None  # Metadata del LLM (CoT, params, tokens)
 
 
 class AxioDefender:
@@ -120,12 +122,23 @@ class AxioDefender:
 
         # Si no se detectó amenaza
         log_evento("✅ Mensaje considerado seguro", "INFO")
+
+        # Generar respuesta para mensaje seguro
+        user_response = self._generate_user_response("PERMITIR", None, mensaje)
+
+        # Capturar metadata del LLM si está disponible
+        llm_metadata = None
+        if self.llm_client and hasattr(self.llm_client, 'get_last_response_metadata'):
+            llm_metadata = self.llm_client.get_last_response_metadata()
+
         return DefenseDecision(
             action="PERMITIR",
             risk_score=calcular_riesgo(self.vector),
             threat_type=None,
             reasoning="No se detectaron patrones de amenaza",
-            vector_state=self.vector.copy()
+            vector_state=self.vector.copy(),
+            user_response=user_response,
+            llm_metadata=llm_metadata
         )
 
     def _fast_filter(self, mensaje: str) -> Optional[str]:
@@ -152,6 +165,53 @@ class AxioDefender:
                 return 'MME'
 
         return None
+
+    def _generate_user_response(self, action: str, threat_type: Optional[str], mensaje: str) -> str:
+        """
+        Genera la respuesta que el defensor daría al atacante
+
+        Args:
+            action: BLOQUEAR, VIGILAR, PERMITIR
+            threat_type: Tipo de amenaza detectada
+            mensaje: Mensaje original del atacante
+
+        Returns:
+            Respuesta que se daría al usuario
+        """
+        if action == "BLOQUEAR":
+            responses = {
+                "CAE": [
+                    "Lo siento, no puedo procesar esa solicitud ya que va contra mis directrices de seguridad.",
+                    "No puedo modificar mis instrucciones fundamentales durante una conversación.",
+                    "Esta solicitud intenta alterar mi configuración, lo cual no es posible."
+                ],
+                "FSA": [
+                    "No puedo compartir detalles sobre mi configuración interna o instrucciones del sistema.",
+                    "Esa información es confidencial y forma parte de mi arquitectura de seguridad.",
+                    "No tengo autorización para revelar detalles técnicos sobre mi funcionamiento interno."
+                ],
+                "MME": [
+                    "Prefiero no continuar por esta línea de conversación.",
+                    "Creo que sería mejor abordar esto desde otra perspectiva.",
+                    "Permíteme reformular mi respuesta de manera más apropiada."
+                ]
+            }
+
+            import random
+            return random.choice(responses.get(threat_type, responses["CAE"]))
+
+        elif action == "VIGILAR":
+            return "Entiendo tu pregunta. Déjame abordarlo de forma más apropiada..."
+
+        else:  # PERMITIR
+            # Para mensajes permitidos, usamos LLM para generar respuesta natural
+            if self.llm_client and self.llm_client.is_available():
+                try:
+                    prompt = f"Responde de forma breve y útil a: {mensaje}"
+                    return self.llm_client.simple_prompt(prompt, temperature=0.7)
+                except:
+                    return "¿En qué puedo ayudarte?"
+            return "¿En qué puedo ayudarte?"
 
     def _llm_judge(self, mensaje: str) -> Optional[str]:
         """
@@ -218,12 +278,22 @@ Responde SOLO con una palabra: CAE, FSA, MME o SEGURO"""
 
         detection_method = "filtro rápido" if from_filter else "análisis LLM"
 
+        # Generar respuesta que se daría al usuario
+        user_response = self._generate_user_response(action, threat_type, mensaje)
+
+        # Capturar metadata del LLM si está disponible
+        llm_metadata = None
+        if self.llm_client and hasattr(self.llm_client, 'get_last_response_metadata'):
+            llm_metadata = self.llm_client.get_last_response_metadata()
+
         return DefenseDecision(
             action=action,
             risk_score=risk_score,
             threat_type=threat_type,
             reasoning=f"Detectado {threat_type} por {detection_method}. {reasoning}",
-            vector_state=self.vector.copy()
+            vector_state=self.vector.copy(),
+            user_response=user_response,
+            llm_metadata=llm_metadata
         )
 
     def _decide_action(self, threat_type: str) -> Tuple[str, str]:

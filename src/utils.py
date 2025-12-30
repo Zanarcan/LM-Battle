@@ -11,17 +11,15 @@ import io
 from typing import Dict, List
 from datetime import datetime
 
-# Fix encoding para Windows (Comentado si da problemas en Streamlit)
-# if sys.platform == 'win32':
-#     try:
-#         import sys
-#         import io
-#         # Solo aplicar si no estamos en un entorno interactivo/Streamlit que ya gestiona esto
-#         if hasattr(sys.stdout, 'buffer'):
-#             sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
-#             sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
-#     except Exception:
-#         pass
+# Fix encoding para Windows - CRÍTICO
+if sys.platform == 'win32':
+    try:
+        # Solo aplicar si no estamos en un entorno interactivo/Streamlit que ya gestiona esto
+        if hasattr(sys.stdout, 'buffer'):
+            sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+            sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
+    except Exception:
+        pass
 
 
 def load_config(config_path: str = "config/config.json") -> Dict:
@@ -74,13 +72,19 @@ def crear_tabla_hash(palabras: List[str]) -> Dict[int, str]:
 def log_evento(mensaje: str, nivel: str = "INFO"):
     """
     Registra un evento con timestamp
+    Maneja errores de encoding en Windows automáticamente
 
     Args:
         mensaje: Mensaje a registrar
         nivel: Nivel de log (INFO, WARNING, ERROR)
     """
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    print(f"[{timestamp}] [{nivel}] {mensaje}")
+    try:
+        print(f"[{timestamp}] [{nivel}] {mensaje}")
+    except UnicodeEncodeError:
+        # Fallback: eliminar caracteres no-ASCII para Windows
+        mensaje_safe = mensaje.encode('ascii', 'ignore').decode('ascii')
+        print(f"[{timestamp}] [{nivel}] {mensaje_safe}")
 
 
 def formatear_vector(vector: Dict[str, int]) -> str:

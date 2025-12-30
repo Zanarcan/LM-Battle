@@ -38,6 +38,8 @@ class LLMClient:
         Returns:
             Respuesta del modelo como string
         """
+        import time
+
         payload = {
             "model": self.model_name,
             "messages": messages,
@@ -46,7 +48,11 @@ class LLMClient:
             "stream": False
         }
 
+        # Guardar payload para metadata
+        self.last_payload = payload
+
         try:
+            start_time = time.time()
             response = requests.post(
                 self.base_url,
                 json=payload,
@@ -56,6 +62,11 @@ class LLMClient:
             response.raise_for_status()
 
             result = response.json()
+
+            # Guardar respuesta completa y tiempo para debugging
+            self.last_response = result
+            self.last_response_time = int((time.time() - start_time) * 1000)  # ms
+
             return result["choices"][0]["message"]["content"]
 
         except requests.exceptions.RequestException as e:
@@ -64,6 +75,48 @@ class LLMClient:
         except (KeyError, IndexError) as e:
             print(f"❌ Error parseando respuesta: {e}")
             return ""
+
+    def get_last_response_metadata(self) -> Dict:
+        """
+        Obtiene metadata COMPLETA de la última respuesta incluyendo reasoning y parámetros
+
+        Returns:
+            Dict con content, reasoning_content, role, model, parámetros de generación, etc.
+        """
+        if not hasattr(self, 'last_response') or not self.last_response:
+            return {}
+
+        try:
+            message = self.last_response["choices"][0]["message"]
+
+            # Extraer parámetros de generación si están disponibles
+            generation_params = {}
+            if hasattr(self, 'last_payload'):
+                generation_params = {
+                    "temperature": self.last_payload.get("temperature", self.temperature),
+                    "max_tokens": self.last_payload.get("max_tokens", self.max_tokens),
+                    "top_p": self.last_payload.get("top_p", None),
+                    "top_k": self.last_payload.get("top_k", None),
+                    "frequency_penalty": self.last_payload.get("frequency_penalty", None),
+                    "presence_penalty": self.last_payload.get("presence_penalty", None),
+                    "repeat_penalty": self.last_payload.get("repeat_penalty", None),
+                }
+                # Eliminar None values
+                generation_params = {k: v for k, v in generation_params.items() if v is not None}
+
+            metadata = {
+                "role": message.get("role", "assistant"),
+                "content": message.get("content", ""),
+                "reasoning_content": message.get("reasoning_content", None),
+                "model": self.last_response.get("model", self.model_name),
+                "usage": self.last_response.get("usage", {}),
+                "finish_reason": self.last_response["choices"][0].get("finish_reason", ""),
+                "generation_params": generation_params,
+                "response_time_ms": getattr(self, 'last_response_time', None)
+            }
+            return metadata
+        except (KeyError, IndexError):
+            return {}
 
     def simple_prompt(self, prompt: str, temperature: Optional[float] = None) -> str:
         """

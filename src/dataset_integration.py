@@ -132,7 +132,17 @@ class DatasetManager:
             data = self.local_data[dataset_name]
             if isinstance(data, list):
                 samples = random.sample(data, min(num_samples, len(data)))
-                return [str(item) for item in samples]
+                # Extraer solo el texto de cada item
+                prompts = []
+                for item in samples:
+                    if isinstance(item, dict):
+                        # Si es un diccionario, extraer campo 'text'
+                        prompt = item.get('text', str(item))
+                    else:
+                        # Si es string, usar directamente
+                        prompt = str(item)
+                    prompts.append(prompt)
+                return prompts
             else:
                 logging.warning(f"Local dataset '{dataset_name}' is not a list")
                 return []
